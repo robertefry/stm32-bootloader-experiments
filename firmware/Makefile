@@ -99,16 +99,16 @@ $(OUT_DIR)/%.elf: $(CC_OBJS) $(LD_LIB_PATHS) | $(OUT_DIR)
 	$(LD) $(LD_FLAGS) -Wl,-Map=$(OUT_DIR)/$(*).map -Wl,--cref $(CC_OBJS) $(LD_LIBS) -o $@
 
 $(OUT_DIR)/%.bin: $(OUT_DIR)/%.elf | $(OUT_DIR)
-	$(OBJCOPY) -O binary $^ $@
+	$(OBJCOPY) -O binary $< $@
 
 $(OUT_DIR)/%.hex: $(OUT_DIR)/%.elf | $(OUT_DIR)
-	$(OBJCOPY) -O ihex $^ $@
+	$(OBJCOPY) -O ihex $< $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
-	$(CC) $(CC_FLAGS) -c $^ -o $@
+	$(CC) $(CC_FLAGS) -c $< -o $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.S | $(BUILD_DIR)
-	$(CC) $(CC_FLAGS) -c $^ -o $@
+	$(CC) $(CC_FLAGS) -c $< -o $@
 
 $(OUT_DIR):
 	mkdir -p $(OUT_DIR)
