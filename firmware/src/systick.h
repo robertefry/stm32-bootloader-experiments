@@ -7,7 +7,7 @@
 /**
  * Setup the system interrupt clock.
  */
-void systick_setup(uint32_t ahb_frequency);
+void systick_setup(void);
 
 /**
  * Get the number of milliseconds since reset.
