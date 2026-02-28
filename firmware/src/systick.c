@@ -11,12 +11,7 @@ static volatile uint64_t s_SysTicksMS = 0;
 
 void systick_setup(void)
 {
-    struct rcc_clock_scale const*
-        clock = &rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ];
-
-    rcc_clock_setup_pll(clock);
-
-    systick_set_frequency(1000, clock->ahb_frequency);
+    systick_set_frequency(1000, rcc_ahb_frequency);
     systick_counter_enable();
     systick_interrupt_enable();
 }
