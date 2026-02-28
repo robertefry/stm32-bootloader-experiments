@@ -1,4 +1,6 @@
 
+#include "systick.h"
+
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 
@@ -16,15 +18,6 @@ static void gpio_setup(void) {
     gpio_mode_setup(LED_PORT, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, LED_PIN);
 }
 
-static void delay_millis_approx(unsigned long millis)
-{
-    unsigned int cycles = millis * (s_RccClockConfig->ahb_frequency / 6000);
-
-    for (unsigned long i = 0; i < cycles; ++i) {
-        __asm__("nop");
-    }
-}
-
 int main(void)
 {
     struct rcc_clock_scale const*
@@ -32,10 +25,11 @@ int main(void)
 
     rcc_setup(clock);
     gpio_setup();
+    systick_setup(clock->ahb_frequency);
 
     while (true) {
         gpio_toggle(LED_PORT, LED_PIN);
-        delay_millis_approx(1000);
+        delay_ms(1000);
     }
 
     return 0;

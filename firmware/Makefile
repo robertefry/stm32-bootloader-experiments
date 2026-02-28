@@ -14,6 +14,7 @@ BINARY  := nucleo-f446re
 # Source Files
 
 SRCS += $(SRC_DIR)/main.c
+SRCS += $(SRC_DIR)/systick.c
 
 ################################################################################
 # STM32F446RET6
