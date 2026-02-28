@@ -5,11 +5,16 @@
     "tasks": [
         {
             "type": "shell",
-            "label": "build_debug_firmware",
-            "options": {
-                "cwd": "firmware",
-            },
-            "command": "make MODE=debug bin",
+            "label": "build_debug_firmware_elf",
+            "options": { "cwd": "${workspaceFolder}/firmware" },
+            "command": "make MODE=debug elf",
+            "problemMatcher": "$gcc",
+        },
+        {
+            "type": "shell",
+            "label": "build_release_firmware_elf",
+            "options": { "cwd": "${workspaceFolder}/firmware" },
+            "command": "make MODE=release elf",
             "problemMatcher": "$gcc",
         },
     ],

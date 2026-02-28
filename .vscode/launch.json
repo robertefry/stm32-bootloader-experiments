@@ -6,6 +6,7 @@
     "configurations": [
         {
             "name": "ST-Link: Debug Application",
+            "preLaunchTask": "build_debug_firmware_elf",
             "cwd": "${workspaceFolder}/firmware",
             "executable": "./.build/debug/nucleo-f446re.elf",
             "servertype": "stutil",
@@ -16,7 +17,6 @@
             "interface": "swd",
             "armToolchainPath": "/usr/bin",
             "showDevDebugOutput": "raw",
-            "preLaunchTask": "build_debug_firmware",
         },
     ],
 }
