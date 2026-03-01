@@ -13,16 +13,6 @@ SRCS += $(SRC_DIR)/main.c
 SRCS += $(SRC_DIR)/systick.c
 
 ################################################################################
-# Hardware Configuration (STM32F446RET6)
-
-PLATFORM := nucleo-f446re
-
-ARCH_FLAGS := -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16
-
-CC_FLAGS += $(ARCH_FLAGS) -DSTM32F4
-LD_FLAGS += $(ARCH_FLAGS) -T$(PLATFORM).ld
-
-################################################################################
 # Dep: LibOpenCM3
 
 LIB_OPENCM3_NAME = opencm3_stm32f4
@@ -37,6 +27,16 @@ LD_LIB_PATHS += $(LIB_OPENCM3)
 
 LD_FLAGS += -L$(LIB_OPENCM3_DIR)/lib
 CC_FLAGS += -I$(LIB_OPENCM3_DIR)/include
+
+################################################################################
+# Hardware Configuration (STM32F446RET6)
+
+PLATFORM := nucleo-f446re
+
+ARCH_FLAGS := -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16
+
+CC_FLAGS += $(ARCH_FLAGS) -DSTM32F4
+LD_FLAGS += $(ARCH_FLAGS) -T$(PLATFORM).ld
 
 ################################################################################
 # Build Mode
