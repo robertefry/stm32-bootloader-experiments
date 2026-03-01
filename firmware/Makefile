@@ -1,8 +1,6 @@
 
 # TODO: Hide compile output when not in verbose mode.
 
-BUILD_DIR := .build
-
 BINARY := firmware
 
 SRC_DIR := src
@@ -11,6 +9,12 @@ INC_DIR := include
 # Source Files
 SRCS += $(SRC_DIR)/main.c
 SRCS += $(SRC_DIR)/systick.c
+
+################################################################################
+# Dep: Common
+
+LIB_COMMON_DIR = ../common
+CC_FLAGS += -I$(LIB_COMMON_DIR)/include
 
 ################################################################################
 # Dep: LibOpenCM3
@@ -42,6 +46,8 @@ LD_FLAGS += $(ARCH_FLAGS) -T$(PLATFORM).ld
 # Build Mode
 
 BUILD ?= debug
+BUILD_DIR ?= .build/$(BUILD)
+
 BUILD_SET := false
 
 ifeq ($(BUILD),release)
@@ -73,9 +79,8 @@ CC_FLAGS += -Wimplicit-function-declaration -Wredundant-decls
 CC_FLAGS += -Wstrict-prototypes
 
 LD_FLAGS += --static -nostartfiles
-LD_FLAGS += -Wl,-gc-sections #-Wl,--print-gc-sections
-# TODO: Print GC sections when in verbose mode.
-
+LD_FLAGS += -Wl,-gc-sections
+LD_FLAGS += -Wl,-Map=$(BUILD_DIR)/$(*).map -Wl,--cref
 LD_FLAGS += -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
 
 ################################################################################
@@ -86,25 +91,20 @@ OBJCOPY := arm-none-eabi-objcopy
 CC_OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
 LD_LIBS = $(addprefix -l,$(LD_LIB_NAMES))
 
-OUT_DIR := $(BUILD_DIR)/$(MODE)
+all: elf bin
+.DEFAULT_GOAL := all
 
-all: bin elf hex
-
-elf: $(OUT_DIR)/$(PLATFORM)-$(BINARY).elf
-bin: $(OUT_DIR)/$(PLATFORM)-$(BINARY).bin
-hex: $(OUT_DIR)/$(PLATFORM)-$(BINARY).hex
+elf: $(BUILD_DIR)/$(PLATFORM)-$(BINARY).elf
+bin: $(BUILD_DIR)/$(PLATFORM)-$(BINARY).bin
 
 clean:
 	$(RM) -dr $(BUILD_DIR)
 
-$(OUT_DIR)/%.elf: $(CC_OBJS) $(LD_LIB_PATHS) | $(OUT_DIR)
-	$(LD) $(LD_FLAGS) -Wl,-Map=$(OUT_DIR)/$(*).map -Wl,--cref $(CC_OBJS) $(LD_LIBS) -o $@
+$(BUILD_DIR)/%.elf: $(CC_OBJS) $(LD_LIB_PATHS) | $(BUILD_DIR)
+	$(LD) $(LD_FLAGS) $(CC_OBJS) $(LD_LIBS) -o $@
 
-$(OUT_DIR)/%.bin: $(OUT_DIR)/%.elf | $(OUT_DIR)
+$(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
 	$(OBJCOPY) -O binary $< $@
-
-$(OUT_DIR)/%.hex: $(OUT_DIR)/%.elf | $(OUT_DIR)
-	$(OBJCOPY) -O ihex $< $@
 
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 	$(CC) $(CC_FLAGS) -c $< -o $@
@@ -112,13 +112,5 @@ $(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
 $(BUILD_DIR)/%.o: $(SRC_DIR)/%.S | $(BUILD_DIR)
 	$(CC) $(CC_FLAGS) -c $< -o $@
 
-$(OUT_DIR):
-	mkdir -p $(OUT_DIR)
-
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
-
--include $(CC_OBJS:.o=.d)
-
-.PHONY: all elf bin hex
-.DEFAULT_GOAL := all
