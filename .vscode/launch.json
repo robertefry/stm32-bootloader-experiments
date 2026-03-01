@@ -5,8 +5,8 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "ST-Link: Debug Application",
-            "preLaunchTask": "build_debug_firmware_elf",
+            "name": "ST-Link: Debug Firmware",
+            "preLaunchTask": "build_debug_firmware",
             "cwd": "${workspaceFolder}/firmware",
             "executable": "./.build/debug/nucleo-f446re.elf",
             "servertype": "stutil",

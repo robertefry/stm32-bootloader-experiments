@@ -4,18 +4,18 @@
     "version": "2.0.0",
     "tasks": [
         {
+            "label": "build_debug_firmware",
             "type": "shell",
-            "label": "build_debug_firmware_elf",
             "options": { "cwd": "${workspaceFolder}/firmware" },
-            "command": "make MODE=debug elf",
-            "problemMatcher": "$gcc",
+            "command": "make",
+            "args": [ "BUILD=debug", ]
         },
         {
+            "label": "flash_release_firmware",
             "type": "shell",
-            "label": "build_release_firmware_elf",
             "options": { "cwd": "${workspaceFolder}/firmware" },
-            "command": "make MODE=release elf",
-            "problemMatcher": "$gcc",
+            "command": "make",
+            "args": [ "BUILD=release", "flash", ]
         },
     ],
 }

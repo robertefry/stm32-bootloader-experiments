@@ -87,6 +87,7 @@ LD_FLAGS += -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
 ################################################################################
 
 OBJCOPY := arm-none-eabi-objcopy
+STFLASH := st-flash
 
 CC_OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
 LD_LIBS = $(addprefix -l,$(LD_LIB_NAMES))
@@ -96,6 +97,9 @@ all: elf bin
 
 elf: $(BUILD_DIR)/$(PLATFORM)-$(BINARY).elf
 bin: $(BUILD_DIR)/$(PLATFORM)-$(BINARY).bin
+
+flash: bin
+	$(STFLASH) write "$(BUILD_DIR)/$(PLATFORM)-$(BINARY).bin" 0x08000000
 
 clean:
 	$(RM) -dr $(BUILD_DIR)
