@@ -3,6 +3,8 @@
 
 BUILD_DIR := .build
 
+BINARY := firmware
+
 SRC_DIR := src
 INC_DIR := include
 
@@ -13,12 +15,12 @@ SRCS += $(SRC_DIR)/systick.c
 ################################################################################
 # Hardware Configuration (STM32F446RET6)
 
-BINARY := nucleo-f446re
+PLATFORM := nucleo-f446re
 
 ARCH_FLAGS := -mthumb -mcpu=cortex-m4 -mfloat-abi=hard -mfpu=fpv4-sp-d16
 
 CC_FLAGS += $(ARCH_FLAGS) -DSTM32F4
-LD_FLAGS += $(ARCH_FLAGS) -T$(BINARY).ld
+LD_FLAGS += $(ARCH_FLAGS) -T$(PLATFORM).ld
 
 ################################################################################
 # Dep: LibOpenCM3
@@ -88,9 +90,9 @@ OUT_DIR := $(BUILD_DIR)/$(MODE)
 
 all: bin elf hex
 
-elf: $(OUT_DIR)/$(BINARY).elf
-bin: $(OUT_DIR)/$(BINARY).bin
-hex: $(OUT_DIR)/$(BINARY).hex
+elf: $(OUT_DIR)/$(PLATFORM)-$(BINARY).elf
+bin: $(OUT_DIR)/$(PLATFORM)-$(BINARY).bin
+hex: $(OUT_DIR)/$(PLATFORM)-$(BINARY).hex
 
 clean:
 	$(RM) -dr $(BUILD_DIR)
