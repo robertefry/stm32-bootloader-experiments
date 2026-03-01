@@ -24,7 +24,7 @@ LD_FLAGS += $(ARCH_FLAGS) -T$(BINARY).ld
 # Dep: LibOpenCM3
 
 LIB_OPENCM3_NAME = opencm3_stm32f4
-LIB_OPENCM3_DIR  = deps/libopencm3
+LIB_OPENCM3_DIR  = ../deps/libopencm3
 LIB_OPENCM3      = $(LIB_OPENCM3_DIR)/lib/lib$(LIB_OPENCM3_NAME).a
 
 $(LIB_OPENCM3):
