@@ -7,6 +7,9 @@ clean:
 	$(MAKE) -C bootloader clean
 	$(MAKE) -C firmware clean
 
+erase:
+	st-flash erase
+
 flash: flash-bootloader flash-firmware
 
 flash-bootloader:
