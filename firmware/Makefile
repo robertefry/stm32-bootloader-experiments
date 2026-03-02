@@ -46,7 +46,7 @@ LD_FLAGS += $(ARCH_FLAGS) -T$(PLATFORM).ld
 # Build Mode
 
 BUILD ?= debug
-BUILD_DIR ?= .build/$(BUILD)
+BUILD_DIR ?= .build
 
 BUILD_SET := false
 
@@ -80,41 +80,46 @@ CC_FLAGS += -Wstrict-prototypes
 
 LD_FLAGS += --static -nostartfiles
 LD_FLAGS += -Wl,-gc-sections
-LD_FLAGS += -Wl,-Map=$(BUILD_DIR)/$(*).map -Wl,--cref
+LD_FLAGS += -Wl,-Map=$(BUILD_DIR)/$(BUILD)/$(*).map -Wl,--cref
 LD_FLAGS += -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
 
 ################################################################################
 ################################################################################
 
 OBJCOPY := arm-none-eabi-objcopy
+OBJDUMP := arm-none-eabi-objdump
 STFLASH := st-flash
 
-CC_OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/%.o,$(SRCS))
+CC_OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/$(BUILD)/%.o,$(SRCS))
 LD_LIBS = $(addprefix -l,$(LD_LIB_NAMES))
 
-all: elf bin
+all: elf bin asm
 .DEFAULT_GOAL := all
-
-elf: $(BUILD_DIR)/$(PLATFORM)-$(BINARY).elf
-bin: $(BUILD_DIR)/$(PLATFORM)-$(BINARY).bin
-
-flash: bin
-	$(STFLASH) write "$(BUILD_DIR)/$(PLATFORM)-$(BINARY).bin" 0x08000000
 
 clean:
 	$(RM) -dr $(BUILD_DIR)
 
-$(BUILD_DIR)/%.elf: $(CC_OBJS) $(LD_LIB_PATHS) | $(BUILD_DIR)
+elf: $(BUILD_DIR)/$(BUILD)/$(PLATFORM)-$(BINARY).elf
+bin: $(BUILD_DIR)/$(BUILD)/$(PLATFORM)-$(BINARY).bin
+asm: $(BUILD_DIR)/$(BUILD)/$(PLATFORM)-$(BINARY).asm
+
+flash: bin
+	$(STFLASH) write "$(BUILD_DIR)/$(BUILD)/$(PLATFORM)-$(BINARY).bin" 0x08000000
+
+$(BUILD_DIR)/$(BUILD)/%.elf: $(CC_OBJS) $(LD_LIB_PATHS) | $(BUILD_DIR)/$(BUILD)
 	$(LD) $(LD_FLAGS) $(CC_OBJS) $(LD_LIBS) -o $@
 
-$(BUILD_DIR)/%.bin: $(BUILD_DIR)/%.elf | $(BUILD_DIR)
+$(BUILD_DIR)/$(BUILD)/%.bin: $(BUILD_DIR)/$(BUILD)/%.elf
 	$(OBJCOPY) -O binary $< $@
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)
+$(BUILD_DIR)/$(BUILD)/%.asm: $(BUILD_DIR)/$(BUILD)/%.elf
+	$(OBJDUMP) -D $< > $@
+
+$(BUILD_DIR)/$(BUILD)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)/$(BUILD)
 	$(CC) $(CC_FLAGS) -c $< -o $@
 
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.S | $(BUILD_DIR)
+$(BUILD_DIR)/$(BUILD)/%.o: $(SRC_DIR)/%.S | $(BUILD_DIR)/$(BUILD)
 	$(CC) $(CC_FLAGS) -c $< -o $@
 
-$(BUILD_DIR):
-	mkdir -p $(BUILD_DIR)
+$(BUILD_DIR)/$(BUILD):
+	mkdir -p $@
