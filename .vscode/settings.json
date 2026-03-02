@@ -2,9 +2,13 @@
     "VsCodeTaskButtons.showCounter": false,
     "VsCodeTaskButtons.tasks": [
         {
-            "label": "Flash FW",
-            "tooltip": "Flash Firmware (Release)",
-            "task": "flash_release_firmware",
+            "label": "Flash",
+            "task": "flash_release",
+            "alignment": "left",
+        },
+        {
+            "label": "Clean",
+            "task": "clean",
             "alignment": "left",
         },
     ],

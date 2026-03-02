@@ -11,11 +11,18 @@
             "args": [ "BUILD=debug", ]
         },
         {
-            "label": "flash_release_firmware",
+            "label": "flash_release",
             "type": "shell",
-            "options": { "cwd": "${workspaceFolder}/firmware" },
+            "options": { "cwd": "${workspaceFolder}" },
             "command": "make",
             "args": [ "BUILD=release", "flash", ]
+        },
+        {
+            "label": "clean",
+            "type": "shell",
+            "options": { "cwd": "${workspaceFolder}" },
+            "command": "make",
+            "args": [ "clean", ]
         },
     ],
 }

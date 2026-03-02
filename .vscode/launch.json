@@ -8,7 +8,7 @@
             "name": "ST-Link: Debug Firmware",
             "preLaunchTask": "build_debug_firmware",
             "cwd": "${workspaceFolder}/firmware",
-            "executable": "./.build/debug/nucleo-f446re.elf",
+            "executable": "./.build/debug/nucleo-f446re-firmware.elf",
             "servertype": "stutil",
             "request": "launch",
             "runToEntryPoint": "main",
