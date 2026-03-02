@@ -2,7 +2,7 @@
 /* Define memory regions. */
 MEMORY
 {
-    block0_flash (rx)  : ORIGIN = 0x08008000, LENGTH = 480K
+    block0_flash (rx)  : ORIGIN = 0x08000000, LENGTH =  32K
     block1_sram0 (rwx) : ORIGIN = 0x20000000, LENGTH = 112K
     block1_sram1 (rwx) : ORIGIN = 0x2001C000, LENGTH =  16K
 }

@@ -1,14 +1,13 @@
 
 # TODO: Hide compile output when not in verbose mode.
 
-BINARY := firmware
+BINARY := bootloader
 
 SRC_DIR := src
 INC_DIR := include
 
 # Source Files
 SRCS += $(SRC_DIR)/main.c
-SRCS += $(SRC_DIR)/systick.c
 
 ################################################################################
 # Dep: Common
@@ -104,7 +103,7 @@ bin: $(BUILD_DIR)/$(BUILD)/$(PLATFORM)-$(BINARY).bin
 asm: $(BUILD_DIR)/$(BUILD)/$(PLATFORM)-$(BINARY).asm
 
 flash: bin
-	$(STFLASH) write "$(BUILD_DIR)/$(BUILD)/$(PLATFORM)-$(BINARY).bin" 0x08008000
+	$(STFLASH) write "$(BUILD_DIR)/$(BUILD)/$(PLATFORM)-$(BINARY).bin" 0x08000000
 
 $(BUILD_DIR)/$(BUILD)/%.elf: $(CC_OBJS) $(LD_LIB_PATHS) | $(BUILD_DIR)/$(BUILD)
 	$(LD) $(LD_FLAGS) $(CC_OBJS) $(LD_LIBS) -o $@
