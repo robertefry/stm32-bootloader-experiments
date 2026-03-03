@@ -2,13 +2,21 @@
     "VsCodeTaskButtons.showCounter": false,
     "VsCodeTaskButtons.tasks": [
         {
-            "label": "Flash",
-            "task": "flash_release",
+            "label": "Clean",
+            "tooltip": "Clean the entire project of build files.",
+            "task": "clean",
             "alignment": "left",
         },
         {
-            "label": "Clean",
-            "task": "clean",
+            "label": "Make",
+            "tooltip": "Make everything in Release mode.",
+            "task": "make_release",
+            "alignment": "left",
+        },
+        {
+            "label": "Flash",
+            "tooltip": "Flash all platform images in Release mode.",
+            "task": "flash_release",
             "alignment": "left",
         },
     ],

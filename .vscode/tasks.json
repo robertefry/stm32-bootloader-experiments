@@ -11,6 +11,13 @@
             "args": [ "BUILD=debug", ]
         },
         {
+            "label": "make_release",
+            "type": "shell",
+            "options": { "cwd": "${workspaceFolder}" },
+            "command": "make",
+            "args": [ "BUILD=release", ]
+        },
+        {
             "label": "flash_release",
             "type": "shell",
             "options": { "cwd": "${workspaceFolder}" },
