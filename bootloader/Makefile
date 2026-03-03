@@ -2,7 +2,9 @@
 PROJECT_ROOT := ..
 
 BINARY := bootloader
-FLASH_OFFSET := 0x08000000
+
+FLASH_ORIGIN := 0x08000000
+FLASH_LENGTH := 32K
 
 SRC_DIR := src
 INC_DIR := include

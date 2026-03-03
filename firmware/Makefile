@@ -2,7 +2,9 @@
 PROJECT_ROOT := ..
 
 BINARY := firmware
-FLASH_OFFSET := 0x08008000
+
+FLASH_ORIGIN := 0x08008000
+FLASH_LENGTH := 480K
 
 SRC_DIR := src
 INC_DIR := include
