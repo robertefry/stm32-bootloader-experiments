@@ -50,12 +50,12 @@ BUILD_DIR ?= .build
 BUILD_SET := false
 
 ifeq ($(BUILD),release)
-  CC_FLAGS += -D NDEBUG
+  CC_FLAGS += -Os -DNDEBUG
   BUILD_SET := true
 endif
 
 ifeq ($(BUILD),debug)
-  CC_FLAGS += -ggdb3
+  CC_FLAGS += -Og -ggdb3
   BUILD_SET := true
 endif
 
@@ -70,7 +70,7 @@ CC    := arm-none-eabi-gcc
 LD    := arm-none-eabi-gcc
 DB    := arm-none-eabi-gdb
 
-CC_FLAGS += -std=c17 -Os -MD -I$(INC_DIR)
+CC_FLAGS += -std=c17 -MD -I$(INC_DIR)
 CC_FLAGS += -fno-common -ffunction-sections -fdata-sections
 
 CC_FLAGS += -Wall -Wextra -Wshadow -Wundef
