@@ -92,7 +92,7 @@ STFLASH := st-flash
 CC_OBJS = $(patsubst $(SRC_DIR)/%.c,$(BUILD_DIR)/$(BUILD)/%.o,$(SRCS))
 LD_LIBS = $(addprefix -l,$(LD_LIB_NAMES))
 
-all: elf bin asm
+all: elf bin lst
 .DEFAULT_GOAL := all
 
 clean:
@@ -100,7 +100,7 @@ clean:
 
 elf: $(BUILD_DIR)/$(BUILD)/$(PLATFORM)-$(BINARY).elf
 bin: $(BUILD_DIR)/$(BUILD)/$(PLATFORM)-$(BINARY).bin
-asm: $(BUILD_DIR)/$(BUILD)/$(PLATFORM)-$(BINARY).asm
+lst: $(BUILD_DIR)/$(BUILD)/$(PLATFORM)-$(BINARY).lst
 
 flash: bin
 	$(STFLASH) write "$(BUILD_DIR)/$(BUILD)/$(PLATFORM)-$(BINARY).bin" 0x08000000
@@ -111,7 +111,7 @@ $(BUILD_DIR)/$(BUILD)/%.elf: $(CC_OBJS) $(LD_LIB_PATHS) | $(BUILD_DIR)/$(BUILD)
 $(BUILD_DIR)/$(BUILD)/%.bin: $(BUILD_DIR)/$(BUILD)/%.elf
 	$(OBJCOPY) -O binary $< $@
 
-$(BUILD_DIR)/$(BUILD)/%.asm: $(BUILD_DIR)/$(BUILD)/%.elf
+$(BUILD_DIR)/$(BUILD)/%.lst: $(BUILD_DIR)/$(BUILD)/%.elf
 	$(OBJDUMP) -D $< > $@
 
 $(BUILD_DIR)/$(BUILD)/%.o: $(SRC_DIR)/%.c | $(BUILD_DIR)/$(BUILD)
