@@ -3,7 +3,6 @@ cmake_minimum_required(VERSION 3.12)
 
 add_executable(firmware
   src/main.c
-  src/systick.c
 )
 target_set_standards(firmware)
 
