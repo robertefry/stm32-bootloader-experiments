@@ -1,5 +1,5 @@
 
-#include "systick.h"
+#include "common/systick.h"
 
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>

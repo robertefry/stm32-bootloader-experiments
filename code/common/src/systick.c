@@ -1,5 +1,5 @@
 
-#include "systick.h"
+#include "common/systick.h"
 
 #include <libopencm3/cm3/vector.h>
 #include <libopencm3/cm3/systick.h>
