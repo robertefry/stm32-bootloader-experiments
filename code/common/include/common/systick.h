@@ -1,6 +1,6 @@
 
-#ifndef SYSTICK_H
-#define SYSTICK_H
+#ifndef COMMON_SYSTICK_H
+#define COMMON_SYSTICK_H
 
 #include <stdint.h>
 
@@ -22,4 +22,4 @@ uint64_t millis(void);
  */
 void delay_ms(uint64_t ms);
 
-#endif /* SYSTICK_H */
+#endif /* COMMON_SYSTICK_H */
