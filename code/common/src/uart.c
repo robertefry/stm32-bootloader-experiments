@@ -11,13 +11,10 @@
 #define UART_RX_BUFFER_SIZE 64
 
 struct UartRx {
-    char buffer[UART_RX_BUFFER_SIZE];
+    uint8_t buffer[UART_RX_BUFFER_SIZE];
     struct RingView ring_view;
 };
-
-// FIXME: Discrepancy between volatile data and non-volatile ringview functions
-// Using template functions (#define) will fix this
-static volatile struct UartRx s_UartRx;
+static struct UartRx s_UartRx;
 
 void usart2_isr(void)
 {
@@ -27,18 +24,14 @@ void usart2_isr(void)
     bool received = usart_get_flag(USART2, USART_FLAG_RXNE);
 
     if (received || overflow) {
-        // we use uint8_t to enforce receiving 8 bits per packet
         uint8_t data = (uint8_t)usart_recv(USART2);
-
-        // FIXME: ringview uses #define functions
-        static_assert(sizeof(data) == sizeof(char));
-        ringview_push(&s_UartRx.ring_view, (char*)&data, sizeof(data));
+        ringview_push(&s_UartRx.ring_view, &data);
     }
 }
 
 void uart_setup(uint32_t baudrate)
 {
-    s_UartRx.ring_view = ringview_create(s_UartRx.buffer, sizeof(s_UartRx.buffer));
+    ringview_init(&s_UartRx.ring_view, &s_UartRx.buffer, UART_RX_BUFFER_SIZE);
 
     rcc_periph_clock_enable(RCC_USART2);
 
@@ -57,22 +50,17 @@ void uart_setup(uint32_t baudrate)
 size_t uart_tx_write(uint8_t const* buffer, size_t size)
 {
     for (size_t i = 0; i < size; ++i) {
-        // TODO: Do we need to manually set the parity bits here?
         usart_send_blocking(USART2, (uint16_t)buffer[i]);
     }
+    return size;
 }
 
 size_t uart_rx_available(void)
 {
-    return s_UartRx.ring_view.size;
+    return ringview_size(&s_UartRx.ring_view);
 }
 
 size_t uart_rx_read(uint8_t* buffer, size_t size)
 {
-    // FIXME: Enter critical section for ringview_pop read-modify-write.
-    // Or make ringview read-write safe. (see ringview.h)
-
-    // FIXME: ringview uses #define functions
-    static_assert(sizeof(*buffer) == sizeof(char));
-    return ringview_pop(&s_UartRx.ring_view, (char*)buffer, size);
+    return ringview_pop(&s_UartRx.ring_view, buffer);
 }
