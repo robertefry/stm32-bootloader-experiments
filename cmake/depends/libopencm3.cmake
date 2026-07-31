@@ -7,29 +7,42 @@ CPMAddPackage(
 )
 
 execute_process(
-  COMMAND make -C ${libopencm3_SOURCE_DIR}
-  RESULT_VARIABLE result
-  WORKING_DIRECTORY ${libopencm3_SOURCE_DIR}
+  COMMAND make -C ${libopencm3_SOURCE_DIR} list-targets
+  OUTPUT_VARIABLE libopencm3_targets
+  OUTPUT_STRIP_TRAILING_WHITESPACE
 )
-if(NOT result EQUAL 0)
-  message(FATAL_ERROR "Failed to build libopencm3.")
-endif()
+separate_arguments(libopencm3_targets)
 
-file(GLOB libopencm3_ARCHIVES
-  ${libopencm3_SOURCE_DIR}/lib/libopencm3_*.a
-)
+foreach(target IN LISTS libopencm3_targets)
 
-foreach(archive ${libopencm3_ARCHIVES})
+  string(REPLACE "/" "" target_name ${target})
 
-  get_filename_component(libopencm3_archive ${archive} NAME_WLE)
+  set(libopencm3_target "libopencm3_${target_name}")
+  set(libopencm3_archive "${libopencm3_SOURCE_DIR}/lib/libopencm3_${target_name}.a")
 
-  add_library(${libopencm3_archive} STATIC IMPORTED GLOBAL)
+  add_custom_command(
+    OUTPUT ${libopencm3_archive}
+    COMMAND make -C ${libopencm3_SOURCE_DIR} TARGETS=${target}
+    WORKING_DIRECTORY ${libopencm3_SOURCE_DIR}
+    COMMENT "Building ${libopencm3_target}"
+  )
 
-  set_target_properties(${libopencm3_archive} PROPERTIES
-    IMPORTED_LOCATION ${archive}
+  add_custom_target(
+    ${libopencm3_target}_build
+    DEPENDS ${libopencm3_archive}
+  )
+
+  add_library(${libopencm3_target} STATIC IMPORTED GLOBAL)
+
+  set_target_properties(
+    ${libopencm3_target} PROPERTIES
+    IMPORTED_LOCATION ${libopencm3_archive}
     INTERFACE_INCLUDE_DIRECTORIES ${libopencm3_SOURCE_DIR}/include
   )
 
-  add_dependencies(${libopencm3_archive} libopencm3_build)
+  add_dependencies(
+    ${libopencm3_target}
+    ${libopencm3_target}_build
+  )
 
 endforeach()
