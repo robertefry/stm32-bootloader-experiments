@@ -1,66 +1,93 @@
 
 #include "common/ringview.h"
+#include "common/math.h"
+#include "common/debug.h"
 
 #include <string.h>
 
-bool _ringview_init(struct RingView* rv, unsigned char* buffer, size_t length, size_t stride)
+void ringview_spsc_init(struct RingViewSPSC* rv, void* buffer, size_t size, size_t stride)
 {
-    if (length == 0 || (length & (length-1)) == 0) {
-        // length is not a non-zero power of two
-        return false;
-    }
+    DEBUG_ASSERT(
+        stride != 0 && (stride & (stride-1)) == 0
+        , "Req: the stride must be a non-zero power of two"
+    );
 
-    *rv = (struct RingView){
+    // round down the size to the nearest multiple of stride for alignment
+    size -= size & (stride - 1);
+
+    DEBUG_ASSERT(
+        size != 0
+        , "Req: reserve one stride to denote the full state"
+    );
+
+    *rv = (struct RingViewSPSC){
         .buffer = buffer,
-        .length = length,
+        .size = size,
         .stride = stride,
         .tail = 0,
         .head = 0,
     };
-    return true;
 }
 
-size_t ringview_size(struct RingView* rv)
+bool ringview_spsc_empty(struct RingViewSPSC const* rv)
 {
-    size_t length = rv->length;
-    size_t tail = atomic_load_explicit(&rv->tail, memory_order_acquire) % length;
-    size_t head = atomic_load_explicit(&rv->head, memory_order_acquire) % length;
+    size_t tail = atomic_load_explicit(&rv->tail, memory_order_acquire);
+    size_t head = atomic_load_explicit(&rv->head, memory_order_acquire);
 
-    return (length + tail - head) % length;
+    return head == tail;
 }
 
-size_t ringview_capacity(struct RingView* rv)
+size_t ringview_spsc_size(struct RingViewSPSC const* rv)
 {
-    // we sacrifice one index to flag the buffer full
-    return rv->length - 1;
+    size_t tail = atomic_load_explicit(&rv->tail, memory_order_acquire);
+    size_t head = atomic_load_explicit(&rv->head, memory_order_acquire);
+
+    return (rv->size + tail - head) % rv->size;
 }
 
-bool _ringview_push(struct RingView* rv, void const* data, size_t size)
+size_t ringview_spsc_capacity(struct RingViewSPSC const* rv)
 {
-    size_t capacity = ringview_capacity(rv);
-    size_t remaining_bytes = rv->stride * (capacity - ringview_size(rv));
+    return rv->size - rv->stride;
+}
 
-    if (size > remaining_bytes) {
+bool ringview_spsc_push(struct RingViewSPSC* rv, void const* data, size_t size)
+{
+    DEBUG_ASSERT(
+        size == ((size + rv->stride - 1) & ~(rv->stride - 1))
+        , "Req: size must be a multiple of the stride"
+    );
+
+    if (size > ringview_spsc_capacity(rv) - ringview_spsc_size(rv)) {
         return false;
     }
 
-    size_t tail = atomic_fetch_add_explicit(&rv->tail, size, memory_order_release) % capacity;
-    memcpy(rv->buffer + tail * rv->stride, data, size);
+    size_t tail = atomic_load_explicit(&rv->tail, memory_order_relaxed);
+    size_t chunk = min(size, rv->size - tail);
 
+    memcpy((unsigned char*)rv->buffer + tail, data, chunk);
+    memcpy(rv->buffer, (unsigned char*)data + chunk, size - chunk);
+
+    atomic_store_explicit(&rv->tail, (tail + size) % rv->size, memory_order_release);
     return true;
 }
 
-bool _ringview_pop(struct RingView* rv, void* data, size_t size)
+bool ringview_spsc_pop(struct RingViewSPSC* rv, void* data, size_t size)
 {
-    size_t capacity = ringview_capacity(rv);
-    size_t stored_bytes = rv->stride * ringview_size(rv);
+    DEBUG_ASSERT(
+        size == ((size + rv->stride - 1) & ~(rv->stride - 1))
+        , "Req: size must be a multiple of the stride"
+    );
 
-    if (stored_bytes < size) {
+    if (size > ringview_spsc_size(rv)) {
         return false;
     }
 
-    size_t head = atomic_fetch_add_explicit(&rv->head, size, memory_order_release) % capacity;
-    memcpy(data, rv->buffer + head * rv->stride, size);
+    size_t head = atomic_load_explicit(&rv->head, memory_order_relaxed);
+    size_t chunk = min(size, rv->size - head);
 
+    memcpy(data, (unsigned char*)rv->buffer + head, chunk);
+    memcpy((unsigned char*)data + chunk, rv->buffer, size - chunk);
+
+    atomic_store_explicit(&rv->head, (head + size) % rv->size, memory_order_release);
     return true;
 }

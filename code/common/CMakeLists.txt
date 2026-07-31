@@ -5,6 +5,7 @@ add_library(common STATIC
   src/ringview.c
   src/systick.c
   src/uart.c
+  src/terminate.c
 )
 
 target_link_libraries(common PUBLIC
