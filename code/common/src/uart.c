@@ -19,8 +19,6 @@ static struct UartRx s_UartRx;
 
 void usart2_isr(void)
 {
-    // FIXME: Disable interrupts while running this ISR.
-
     bool overflow = usart_get_flag(USART2, USART_FLAG_ORE);
     bool received = usart_get_flag(USART2, USART_FLAG_RXNE);
 
