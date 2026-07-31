@@ -6,8 +6,15 @@
 #include <libopencm3/stm32/rcc.h>
 
 #include <stdint.h>
+#include <stdatomic.h>
 
-static volatile uint64_t s_SysTicksMS = 0;
+static atomic_uint_fast32_t s_SysTicksMS = 0;
+
+void sys_tick_handler(void)
+{
+    static_assert(atomic_is_lock_free(&s_SysTicksMS));
+    atomic_fetch_add_explicit(&s_SysTicksMS, 1, memory_order_relaxed);
+}
 
 void systick_setup(void)
 {
@@ -16,23 +23,16 @@ void systick_setup(void)
     systick_interrupt_enable();
 }
 
-void sys_tick_handler(void)
+uint32_t millis()
 {
-    // TODO: Use libc atomics library.
-    // FIXME: Disable interrupts, while we're on a single-core MPU.
-    s_SysTicksMS += 1;
+    return atomic_load_explicit(&s_SysTicksMS, memory_order_relaxed);
 }
 
-uint64_t millis()
+void delay_ms(uint32_t ms)
 {
-    return s_SysTicksMS;
-}
+    uint32_t start = millis();
 
-void delay_ms(uint64_t ms)
-{
-    uint64_t start = millis();
-
-    while ((millis() - start) < ms) {
+    while (millis() - start < ms) {
         __asm__("nop");
     }
 }

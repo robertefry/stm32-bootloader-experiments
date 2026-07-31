@@ -14,12 +14,12 @@ void systick_setup(void);
  *
  * Requires `systick_setup` be called during setup.
  */
-uint64_t millis(void);
+uint32_t millis(void);
 
 /**
  * Delay for a number of milliseconds.
  * Implemented as a busy wait.
  */
-void delay_ms(uint64_t ms);
+void delay_ms(uint32_t ms);
 
 #endif /* COMMON_SYSTICK_H */

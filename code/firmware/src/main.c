@@ -1,16 +1,22 @@
 
 #include "common/systick.h"
+#include "common/uart.h"
 
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/timer.h>
 #include <libopencm3/stm32/gpio.h>
 
 #include <stdbool.h>
+#include <iso646.h>
 
 #define LED_PORT        GPIOA
 #define LED_PIN         GPIO5
 #define LED_TIMER       TIM2
 #define LED_OC          TIM_OC1
+
+#define UART_PORT       GPIOA
+#define UART_RX_PIN     GPIO3
+#define UART_TX_PIN     GPIO2
 
 #define PWM_FREQUENCY   1000 // 1kHz
 #define PWM_PRECISION   1000
@@ -41,6 +47,10 @@ static void setup(void)
     // Enable the LED pin.
     gpio_mode_setup(LED_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, LED_PIN);
     gpio_set_af(LED_PORT, GPIO_AF1, LED_PIN);
+
+    // Enable the UART pins.
+    gpio_mode_setup(UART_PORT, GPIO_MODE_AF, GPIO_PUPD_NONE, UART_RX_PIN | UART_TX_PIN);
+    gpio_set_af(UART_PORT, GPIO_AF7, UART_RX_PIN | UART_TX_PIN);
 }
 
 static uint32_t map_duty_state(uint32_t num_states, uint32_t state)
@@ -52,23 +62,48 @@ static uint32_t map_duty_state(uint32_t num_states, uint32_t state)
     return (index * index * PWM_PRECISION) / (num_states * num_states);
 }
 
-static void loop(void)
+static void loop_pwm(void)
 {
     static uint32_t const num_duty_states = 50;
     static uint32_t duty_state = 0;
 
-    duty_state = (duty_state + 1) % (2 * num_duty_states);
-    uint32_t duty_cycle = map_duty_state(num_duty_states, duty_state);
-
+    uint32_t duty_cycle = map_duty_state(num_duty_states, ++duty_state);
     timer_set_oc_value(TIM2, LED_OC, duty_cycle);
 
+    // TODO: Maybe use something less intrusive than a delay.
+    // Perhaps a proper timed task scheduler running from the delay interrupt.
     delay_ms(2000 / num_duty_states);
+}
+
+static void loop_uart(void)
+{
+    if (not uart_rx_available()) {
+        return;
+    }
+
+    uint8_t data;
+    if (uart_rx_read(&data, sizeof(data)) != sizeof(data)) {
+        // TODO: Handle the error case where we did not read enough bytes.
+    }
+
+    // For now, just return back the data we got plus one.
+    data += 1;
+    if (uart_tx_write(&data, sizeof(data)) != sizeof(data)) {
+        // TODO: Handle the error case where we did not write enough bytes.
+    }
+}
+
+static void loop(void)
+{
+    loop_pwm();
+    loop_uart();
 }
 
 int main(void)
 {
     rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]);
     systick_setup();
+    uart_setup(11520);
 
     setup();
 
