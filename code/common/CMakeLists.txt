@@ -8,6 +8,10 @@ add_library(common STATIC
   src/terminate.c
 )
 
+target_link_options(common PUBLIC
+  -nostartfiles
+)
+
 target_link_libraries(common PUBLIC
   stm32f4
   libopencm3_stm32f4

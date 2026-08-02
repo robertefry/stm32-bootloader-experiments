@@ -26,9 +26,15 @@ function(target_set_standards target)
     -Wall -Wextra -Wshadow -Wundef
     -Wimplicit-function-declaration
     -Wredundant-decls
+    -Wmissing-declarations
+    -Wmissing-variable-declarations
     -Wstrict-prototypes
-    -fno-common
-    -MD
+    -Wmissing-prototypes
+    -Wmissing-attributes
+    -Wmissing-noreturn
+  )
+
+  target_compile_options(${target} PRIVATE
     $<$<CONFIG:Debug>:
       -Og -g
     >
@@ -43,17 +49,9 @@ function(target_set_standards target)
     >
   )
 
-  target_link_options(${target} PRIVATE
-    -nostartfiles
-    -Wl,-gc-sections
-    -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group
-  )
-
-  add_custom_command(TARGET ${target} POST_BUILD
-    COMMAND ${CMAKE_SIZE} $<TARGET_FILE_NAME:${target}>
-    WORKING_DIRECTORY $<TARGET_FILE_DIR:${target}>
-    COMMENT "Generating size information for $<TARGET_FILE_NAME:${target}>"
-    VERBATIM
+  target_compile_options(${target} PRIVATE
+    -MD
+    -fno-common
   )
 
   target_link_options(${target} PRIVATE
@@ -77,6 +75,13 @@ function(target_set_standards target)
       $<TARGET_FILE:${target}>
       > $<TARGET_FILE_DIR:${target}>/$<TARGET_FILE_BASE_NAME:${target}>.lst
     COMMENT "Generating $<TARGET_FILE_BASE_NAME:${target}>.lst"
+    VERBATIM
+  )
+
+  add_custom_command(TARGET ${target} POST_BUILD
+    COMMAND ${CMAKE_SIZE} $<TARGET_FILE_NAME:${target}>
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:${target}>
+    COMMENT "Generating size information for $<TARGET_FILE_NAME:${target}>"
     VERBATIM
   )
 
