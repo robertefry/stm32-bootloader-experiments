@@ -57,16 +57,11 @@ function(target_set_standards target)
   target_link_options(${target} PRIVATE
     -Wl,-Map=${CMAKE_CURRENT_BINARY_DIR}/${target}.map -Wl,--cref
   )
-  add_custom_command(TARGET ${target} POST_BUILD
-    COMMAND "" # We just want the post-build comment.
-    COMMENT "Generating $<TARGET_FILE_BASE_NAME:${target}>.map"
-  )
 
   add_custom_command(TARGET ${target} POST_BUILD
-    COMMAND ${CMAKE_OBJCOPY} -O binary
-      $<TARGET_FILE:${target}>
-      $<TARGET_FILE_DIR:${target}>/$<TARGET_FILE_BASE_NAME:${target}>.bin
-    COMMENT "Generating $<TARGET_FILE_BASE_NAME:${target}>.bin"
+    COMMAND ${CMAKE_SIZE} $<TARGET_FILE_NAME:${target}>
+    WORKING_DIRECTORY $<TARGET_FILE_DIR:${target}>
+    COMMENT "Generating size information for $<TARGET_FILE_NAME:${target}>"
     VERBATIM
   )
 
@@ -78,11 +73,22 @@ function(target_set_standards target)
     VERBATIM
   )
 
-  add_custom_command(TARGET ${target} POST_BUILD
-    COMMAND ${CMAKE_SIZE} $<TARGET_FILE_NAME:${target}>
-    WORKING_DIRECTORY $<TARGET_FILE_DIR:${target}>
-    COMMENT "Generating size information for $<TARGET_FILE_NAME:${target}>"
-    VERBATIM
-  )
+  get_target_property(target_type ${target} TYPE)
+  if(target_type STREQUAL "EXECUTABLE")
+
+    add_custom_command(TARGET ${target} POST_BUILD
+      COMMAND "" # We just want the post-build comment.
+      COMMENT "Generating $<TARGET_FILE_BASE_NAME:${target}>.map"
+    )
+
+    add_custom_command(TARGET ${target} POST_BUILD
+      COMMAND ${CMAKE_OBJCOPY} -O binary
+        $<TARGET_FILE:${target}>
+        $<TARGET_FILE_DIR:${target}>/$<TARGET_FILE_BASE_NAME:${target}>.bin
+      COMMENT "Generating $<TARGET_FILE_BASE_NAME:${target}>.bin"
+      VERBATIM
+    )
+
+  endif()
 
 endfunction()

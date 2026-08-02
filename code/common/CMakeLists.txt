@@ -7,6 +7,7 @@ add_library(common STATIC
   src/uart.c
   src/terminate.c
 )
+target_set_standards(common)
 
 target_link_options(common PUBLIC
   -nostartfiles
