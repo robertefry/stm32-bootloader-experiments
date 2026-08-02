@@ -44,7 +44,6 @@ function(target_set_standards target)
   )
 
   target_link_options(${target} PRIVATE
-    --static
     -nostartfiles
     -Wl,-gc-sections
     -Wl,--start-group -lc -lgcc -lnosys -Wl,--end-group

@@ -11,6 +11,7 @@ target_compile_options(stm32f4 INTERFACE
 )
 
 target_link_options(stm32f4 INTERFACE
+  --static
   -mthumb -Wl,--gc-sections
   -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard
 )
