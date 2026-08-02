@@ -6,7 +6,7 @@ target_compile_definitions(stm32f4 INTERFACE
 )
 
 target_compile_options(stm32f4 INTERFACE
-  -mthumb -Wall -ffunction-sections -fdata-sections
+  -mthumb -ffunction-sections -fdata-sections
   -mcpu=cortex-m4 -mfpu=fpv4-sp-d16 -mfloat-abi=hard
 )
 
