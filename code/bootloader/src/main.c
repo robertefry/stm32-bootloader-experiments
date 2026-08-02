@@ -4,22 +4,10 @@
 #include <libopencm3/stm32/rcc.h>
 #include <libopencm3/stm32/gpio.h>
 
-#include <libopencm3/cm3/vector.h>
-#include <libopencm3/cm3/scb.h>
-
 #include <stdint.h>
 
 #define LED_PORT (GPIOA)
 #define LED_PIN  (GPIO5)
-
-static void jump_to_firmware(void)
-{
-    vector_table_t* table = (vector_table_t*)(FIRMWARE_BASE);
-    // TODO: Reset the state of the chip, and disable interrupts, before jumping.
-
-    SCB_VTOR = (uint32_t)table;
-    table->reset();
-}
 
 int main(void)
 {
@@ -34,6 +22,6 @@ int main(void)
         }
     }
 
-    jump_to_firmware();
+    reset(FIRMWARE_BASE);
     return 0;
 }

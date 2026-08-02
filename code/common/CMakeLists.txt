@@ -2,6 +2,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 add_library(common STATIC
+  src/memorymap.c
   src/syscalls.c
   src/systick.c
   src/ringview.c
