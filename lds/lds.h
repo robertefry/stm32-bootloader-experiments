@@ -1,9 +1,13 @@
 
-#define BASE(prefix) (prefix##_BASE)
-#define SIZE(prefix) (prefix##_SIZE)
+#define LD_BASE(prefix) LD_BASE_(prefix)
+#define LD_BASE_(prefix) (prefix##_BASE)
 
-#define BOOTLOADER_BASE     0x08000000U
-#define BOOTLOADER_SIZE     0x00008000U //  32 KiB
+#define LD_SIZE(prefix) LD_SIZE_(prefix)
+#define LD_SIZE_(prefix) (prefix##_SIZE)
 
-#define FIRMWARE_BASE       0x08008000U
-#define FIRMWARE_SIZE       0x00078000U // 480 KiB
+
+#define BOOTLOADER_BASE     0x08000000
+#define BOOTLOADER_SIZE     0x00008000 //  32 KiB
+
+#define FIRMWARE_BASE       0x08008000
+#define FIRMWARE_SIZE       0x00078000 // 480 KiB

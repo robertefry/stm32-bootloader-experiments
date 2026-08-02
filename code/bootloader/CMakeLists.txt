@@ -6,11 +6,7 @@ add_executable(bootloader
 )
 target_set_standards(bootloader)
 
-target_enable_st_flash(bootloader 0x08000000)
-
-target_link_options(bootloader PRIVATE
-  -T${CMAKE_CURRENT_LIST_DIR}/nucleo-f446re.ld
-)
+target_link_script(bootloader FLASH REGION BOOTLOADER)
 
 target_link_libraries(bootloader PUBLIC
   common
