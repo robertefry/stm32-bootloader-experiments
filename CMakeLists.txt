@@ -8,6 +8,7 @@ include("cmake/st-flash.cmake")
 
 project("BareMetal Tutorial")
 
+add_subdirectory(lds)
 add_subdirectory(code/common)
 add_subdirectory(code/bootloader)
 add_subdirectory(code/firmware)

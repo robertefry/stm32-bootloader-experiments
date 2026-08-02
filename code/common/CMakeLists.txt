@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.24)
 
 add_library(common STATIC
-  src/memorymap.c
+  src/reset.c
   src/syscalls.c
   src/systick.c
   src/ringview.c
@@ -19,6 +19,7 @@ target_link_libraries(common INTERFACE
 )
 
 target_link_libraries(common PUBLIC
+  lds
   stm32f4
   libopencm3_stm32f4
 )

@@ -1,5 +1,5 @@
 
-#include "common/memorymap.h"
+#include "common/reset.h"
 
 #include <libopencm3/cm3/vector.h>
 #include <libopencm3/cm3/scb.h>
