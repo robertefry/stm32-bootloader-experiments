@@ -26,10 +26,7 @@ function(target_set_standards target)
     -Wall -Wextra -Wshadow -Wundef
     -Wimplicit-function-declaration
     -Wredundant-decls
-    -Wmissing-declarations
-    -Wmissing-variable-declarations
     -Wstrict-prototypes
-    -Wmissing-prototypes
     -Wmissing-attributes
     -Wmissing-noreturn
   )
