@@ -97,7 +97,7 @@ SECTIONS
     /DISCARD/ : { *(.eh_frame) }
 
     . = ALIGN(4);
-    end = .;
+    _end = .;
 }
 
 PROVIDE(_stack = ORIGIN(block1_sram0) + LENGTH(block1_sram0));
