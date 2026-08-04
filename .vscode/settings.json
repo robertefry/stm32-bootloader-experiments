@@ -1,0 +1,8 @@
+{
+    "VsCodeTaskButtons.tasks": [
+        {
+            "label": "Flash",
+            "task": "build-and-flash",
+        }
+    ]
+}
