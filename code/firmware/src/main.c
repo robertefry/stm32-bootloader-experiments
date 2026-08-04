@@ -103,7 +103,7 @@ int main(void)
 {
     rcc_clock_setup_pll(&rcc_hsi_configs[RCC_CLOCK_3V3_84MHZ]);
     systick_setup();
-    uart_setup(115200);
+    uart_setup(UART_BAUD_115200);
 
     setup();
 

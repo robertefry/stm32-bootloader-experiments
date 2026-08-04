@@ -28,7 +28,7 @@ void usart2_isr(void)
     }
 }
 
-void uart_setup(uint32_t baudrate)
+void uart_setup(enum uart_baud_rate baudrate)
 {
     ringview_spsc_init(
         &s_UartRx.ring_view,
